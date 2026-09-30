@@ -1,7 +1,7 @@
 import qrcode from './vendor/qrcode.js';
 import {content} from './locale.js';
 
-const quizURL = 'http://pages.yqiao.me/six-questions-of-ai/';
+const quizURL = 'https://pages.yqiao.me/six-questions-of-ai/';
 const sans = '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif';
 const serif = '"Songti SC", "STSong", "Noto Serif CJK SC", serif';
 
