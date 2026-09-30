@@ -51,7 +51,18 @@ export async function createResultImage({h,p,key,language='zh'}) {
   const commentTop = 278 + honorSpace + subtitleLines.length * 54;
   const commentHeight = commentLines.length * 66 + 68;
   const dimensionsTop = commentTop + commentHeight + 120;
-  const footerTop = dimensionsTop + 480;
+  const dimensions = ui.axes.map((axis,i) => {
+    const value=i===0?3-h:p;
+    const bias=`${value===0||value===3?ui.strong:ui.slight} · ${value>=2?axis.right:axis.left}`;
+    font(27);const titleWidth=ctx.measureText(axis.title).width;
+    font(25);const stacked=titleWidth+ctx.measureText(bias).width+32>contentWidth;
+    const trackY=stacked?92:58;
+    font(24);const leftLines=lines(axis.left,contentWidth*.48),rightLines=lines(axis.right,contentWidth*.48);
+    const descriptionY=trackY+28+Math.max(leftLines.length,rightLines.length)*30+16;
+    font(26);const descriptionLines=lines(axis.description,contentWidth);
+    return {...axis,value,bias,stacked,trackY,leftLines,rightLines,descriptionY,descriptionLines,height:descriptionY+descriptionLines.length*40+56};
+  });
+  const footerTop = dimensionsTop + dimensions.reduce((sum,axis)=>sum+axis.height,0)+24;
   const qr = qrcode(0,'M'); qr.addData(quizURL); qr.make();
   const modules=qr.getModuleCount(), cell=6, quiet=4, qrSize=(modules+quiet*2)*cell;
   canvas.width=width;canvas.height=footerTop+qrSize+76;
@@ -78,16 +89,19 @@ export async function createResultImage({h,p,key,language='zh'}) {
   ctx.fillStyle=profile.color;ctx.fillRect(margin,commentTop,3,commentHeight);
   ctx.fillStyle='#202124';font(40,serif);commentLines.forEach((line,i)=>ctx.fillText(line,margin+38,commentTop+34+i*66));
   font(30);ctx.fillStyle='#202124';ctx.fillText(ui.dimensions,margin,commentTop+commentHeight+48);
-  function drawDimension(title,value,left,right,y){
+  function drawDimension(axis,y){
+    const {title,value,bias,stacked,trackY,leftLines,rightLines,descriptionY,descriptionLines}=axis;
     const end=width-margin,span=end-margin;
-    ctx.textAlign='left';ctx.fillStyle='#202124';font(language==='en'?26:29,sans,500);ctx.fillText(title,margin,y);
-    ctx.fillStyle=profile.color;font(language==='en'?23:25);const biasLines=lines(`${value===0||value===3?ui.strong:ui.slight} · ${value>=2?right:left}`,span);biasLines.forEach((line,i)=>ctx.fillText(line,margin,y+40+i*27));
-    ctx.fillStyle='#dddde1';ctx.fillRect(margin,y+102,span,3);
-    for(let i=0;i<4;i++)ctx.fillRect(margin+span*i/3,y+96,2,15);
-    ctx.beginPath();ctx.arc(margin+span*value/3,y+103,9,0,2*Math.PI);ctx.fillStyle=profile.color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
-    ctx.fillStyle='#686a70';font(language==='en'?22:24);lines(left,span*.48).forEach((line,i)=>ctx.fillText(line,margin,y+130+i*27));ctx.textAlign='right';lines(right,span*.48).forEach((line,i)=>ctx.fillText(line,end,y+130+i*27));
+    ctx.textAlign='left';ctx.fillStyle='#202124';font(27);ctx.fillText(title,margin,y);
+    ctx.fillStyle=profile.color;font(25);ctx.textAlign=stacked?'left':'right';ctx.fillText(bias,stacked?margin:end,y+(stacked?36:0));
+    ctx.fillStyle='#dddde1';ctx.fillRect(margin,y+trackY,span,3);
+    for(let i=0;i<4;i++)ctx.fillRect(margin+span*i/3,y+trackY-6,2,15);
+    ctx.beginPath();ctx.arc(margin+span*value/3,y+trackY+1,9,0,2*Math.PI);ctx.fillStyle=profile.color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
+    ctx.fillStyle='#686a70';font(24);ctx.textAlign='left';leftLines.forEach((line,i)=>ctx.fillText(line,margin,y+trackY+28+i*30));ctx.textAlign='right';rightLines.forEach((line,i)=>ctx.fillText(line,end,y+trackY+28+i*30));
+    ctx.textAlign='left';font(26);descriptionLines.forEach((line,i)=>ctx.fillText(line,margin,y+descriptionY+i*40));
   }
-  ui.axes.forEach((axis,i)=>drawDimension(axis.title,i===0?3-h:p,axis.left,axis.right,dimensionsTop+i*224));
+  let dimensionY=dimensionsTop;
+  dimensions.forEach(axis=>{drawDimension(axis,dimensionY);dimensionY+=axis.height;});
   ctx.fillStyle='#e4e4e7';ctx.fillRect(margin,footerTop-35,contentWidth,1);
   const qrLeft=width-margin-qrSize;
   ctx.fillStyle='#fff';ctx.fillRect(qrLeft,footerTop,qrSize,qrSize);
