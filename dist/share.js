@@ -4,12 +4,12 @@ import {honorKeys} from './data.js';
 
 const quizURL = 'https://pages.yqiao.me/six-questions-of-ai/';
 const sans = '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif';
-const serif = '"Songti SC", "STSong", "Noto Serif CJK SC", serif';
+const serif = '"Quiz Serif", "Songti SC", "STSong", "Noto Serif CJK SC", serif';
 
 export async function createResultImage({h,p,key,language='zh'}) {
-  await document.fonts.ready;
   const {profiles,ui} = content(language);
   const profile = profiles[key];
+  const titleFamily = h>=2 ? serif : '"Quiz Sans", "PingFang SC", "Microsoft YaHei", sans-serif';
   const honors = honorKeys(h,p).map(id => {
     const label=document.createElement('span');
     label.className='honor-title';label.dataset.honor=id;
@@ -19,6 +19,17 @@ export async function createResultImage({h,p,key,language='zh'}) {
     const item={text:ui.honors[id],family:style.fontFamily,size:parseFloat(style.fontSize),weight:style.fontWeight,color:style.color,background:style.backgroundColor,spacing:parseFloat(style.letterSpacing)||0};
     label.remove();return item;
   });
+  let fontTimeout;
+  try {
+    await Promise.race([
+      Promise.allSettled([
+        document.fonts.load(`600 72px ${titleFamily}`,profile.name),
+        document.fonts.load(`400 40px ${serif}`,profile.note),
+        ...honors.map(honor=>document.fonts.load(`${honor.weight} ${honor.size}px ${honor.family}`,honor.text))
+      ]),
+      new Promise(resolve=>{fontTimeout=setTimeout(resolve,3000);})
+    ]);
+  } finally {clearTimeout(fontTimeout);}
   const honorSpace = honors.length ? 72 : 0;
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
@@ -47,7 +58,7 @@ export async function createResultImage({h,p,key,language='zh'}) {
   ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
   ctx.textBaseline='top';ctx.fillStyle='#65676d';font(30);ctx.fillText(ui.title,margin,58);
   ctx.fillStyle='#e4e4e7';ctx.fillRect(margin,115,contentWidth,1);
-  ctx.fillStyle=profile.color;font(72,serif,600);if(ctx.measureText(profile.name).width>contentWidth)font(72*contentWidth/ctx.measureText(profile.name).width,serif,600);ctx.fillText(profile.name,margin,164);
+  ctx.fillStyle=profile.color;font(72,titleFamily,600);if(ctx.measureText(profile.name).width>contentWidth)font(72*contentWidth/ctx.measureText(profile.name).width,titleFamily,600);ctx.fillText(profile.name,margin,164);
   if(honors.length){
     const scale=1.9,y=256,height=25*scale;
     ctx.fillStyle='#b2b1b0';font(14*scale);ctx.fillText('+',margin,y+7);
