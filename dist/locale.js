@@ -10,10 +10,10 @@ const englishQuestions = [
 ];
 
 const englishProfiles = {
-  technical: {name: 'Technological Humanism', subtitle: 'People develop their abilities through close collaboration with agents, while retaining their agency.', note: 'You welcome new technology, and you like to stay involved. If machines can do more, you have time to consider things more carefully. Others call this saving effort. You find you finally have time to be particular.'},
+  technical: {name: 'Technological Humanism', subtitle: 'People develop their abilities through close collaboration with machines, while retaining their agency.', note: 'You welcome new technology, and you like to stay involved. If machines can do more, you have time to consider things more carefully. Others call this saving effort. You find you finally have time to be particular.'},
   autonomous: {name: 'Machine Autonomism', subtitle: 'Let machines settle machine affairs among themselves.', note: 'Your expectations of machines are modest: once things have been explained, they need not keep asking. Progress ought, eventually, to let a person enjoy a meal in peace. If the work is also finished by dessert, civilization will have made itself useful.'},
   pure: {name: 'Pure Humanism', subtitle: 'People should retain their skills and practice: understanding, creating, and taking charge themselves.', note: 'You have no objection to machines helping. Some things, though, only count once you have done them yourself. Time saved is valuable; knowing you still can is worth something too. Whether this is efficient is a calculation you are in no hurry to delegate.'},
-  reform: {name: 'Machine Reformism', subtitle: 'The world is not changing just yet. Agents will have to learn to use a browser.', note: 'You are willing to hand work to machines, but would rather not rebuild the world before handing it over. The old system has its quirks; at least everyone knows them. A clever new colleague can reasonably be expected to learn a few things.'}
+  reform: {name: 'Machine Reformism', subtitle: 'The world is not changing just yet. Machines will have to learn to use a browser.', note: 'You are willing to hand work to machines, but would rather not rebuild the world before handing it over. The old system has its quirks; at least everyone knows them. A clever new colleague can reasonably be expected to learn a few things.'}
 };
 
 const ui = {
