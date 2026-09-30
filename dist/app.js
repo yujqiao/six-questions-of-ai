@@ -1,4 +1,4 @@
-import {score} from './data.js';
+import {score, honorKeys} from './data.js';
 import {content, initialLanguage, rememberLanguage} from './locale.js';
 
 const app = document.querySelector('#app');
@@ -62,6 +62,7 @@ function coordinatePlane(h, p, key){
 function renderResult(focus = true){
   const {h,p,key}=score(answers);
   const profile=profiles[key];
+  const honors=honorKeys(h,p);
   resultVisible=true;
   document.body.className='result';
   document.body.style.setProperty('--accent',profile.color);
@@ -69,7 +70,7 @@ function renderResult(focus = true){
   document.title=`${profile.name} · ${ui.title}`;
   count.textContent=ui.result;
   footer.textContent=ui.disclaimer;
-  app.innerHTML=`<section aria-labelledby="result-title"><div class="result-heading"><p class="kicker">${ui.kicker}</p><h1 id="result-title" class="result-title" tabindex="-1">${profile.name}</h1><p class="subtitle">${profile.subtitle}</p></div><p class="commentary">${profile.note}</p><section aria-labelledby="dimensions-title"><h2 class="section-title" id="dimensions-title">${ui.dimensions}</h2><div class="result-measures"><div class="dimensions">${ui.axes.map((axis,i)=>dimension(axis.title,i===0?3-h:p,axis.left,axis.right,axis.description)).join('')}</div>${coordinatePlane(h,p,key)}</div></section><nav class="navigation result-actions" aria-label="${ui.actions}"><button type="button" class="button" id="share-result">${ui.share}</button><button type="button" class="button secondary" id="review">${ui.review}</button><button type="button" class="button secondary" id="restart">${ui.restart}</button></nav></section>`;
+  app.innerHTML=`<section aria-labelledby="result-title"><div class="result-heading"><p class="kicker">${ui.kicker}</p><div class="result-identity"><h1 id="result-title" class="result-title" tabindex="-1">${profile.name}</h1>${honors.length?`<div class="honor-titles"><span class="honor-plus" aria-hidden="true">+</span>${honors.map(id=>`<span class="honor-title" data-honor="${id}">${ui.honors[id]}</span>`).join('')}</div>`:''}</div><p class="subtitle">${profile.subtitle}</p></div><p class="commentary">${profile.note}</p><section aria-labelledby="dimensions-title"><h2 class="section-title" id="dimensions-title">${ui.dimensions}</h2><div class="result-measures"><div class="dimensions">${ui.axes.map((axis,i)=>dimension(axis.title,i===0?3-h:p,axis.left,axis.right,axis.description)).join('')}</div>${coordinatePlane(h,p,key)}</div></section><nav class="navigation result-actions" aria-label="${ui.actions}"><button type="button" class="button" id="share-result">${ui.share}</button><button type="button" class="button secondary" id="review">${ui.review}</button><button type="button" class="button secondary" id="restart">${ui.restart}</button></nav></section>`;
   app.querySelector('#share-result').addEventListener('click',async e=>{
     const button=e.currentTarget;button.disabled=true;
     try{const {openResultShare}=await import('./share.js');await openResultShare({h,p,key,language},button);}

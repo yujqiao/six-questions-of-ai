@@ -21,3 +21,8 @@ export function score(answers) {
   const key = h >= 2 ? (p >= 2 ? 'technical' : 'pure') : (p >= 2 ? 'autonomous' : 'reform');
   return { h, p, key };
 }
+
+export function honorKeys(h, p) {
+  return [h === 3 ? 'artisan' : h === 0 ? 'delegator' : null,
+    p === 0 ? 'cua' : p === 3 ? 'reformer' : null].filter(Boolean);
+}

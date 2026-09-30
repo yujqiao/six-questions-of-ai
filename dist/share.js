@@ -1,5 +1,6 @@
 import qrcode from './vendor/qrcode.js';
 import {content} from './locale.js';
+import {honorKeys} from './data.js';
 
 const quizURL = 'https://pages.yqiao.me/six-questions-of-ai/';
 const sans = '-apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", sans-serif';
@@ -9,6 +10,16 @@ export async function createResultImage({h,p,key,language='zh'}) {
   await document.fonts.ready;
   const {profiles,ui} = content(language);
   const profile = profiles[key];
+  const honors = honorKeys(h,p).map(id => {
+    const label=document.createElement('span');
+    label.className='honor-title';label.dataset.honor=id;
+    label.style.cssText='position:absolute;visibility:hidden';
+    document.body.append(label);
+    const style=getComputedStyle(label);
+    const item={text:ui.honors[id],family:style.fontFamily,size:parseFloat(style.fontSize),weight:style.fontWeight,color:style.color,background:style.backgroundColor,spacing:parseFloat(style.letterSpacing)||0};
+    label.remove();return item;
+  });
+  const honorSpace = honors.length ? 72 : 0;
   const canvas = document.createElement('canvas');
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('浏览器暂不支持生成图片。');
@@ -26,7 +37,7 @@ export async function createResultImage({h,p,key,language='zh'}) {
   };
   font(34); const subtitleLines = lines(profile.subtitle, contentWidth);
   font(40,serif); const commentLines = lines(profile.note, contentWidth - 76);
-  const commentTop = 278 + subtitleLines.length * 54;
+  const commentTop = 278 + honorSpace + subtitleLines.length * 54;
   const commentHeight = commentLines.length * 66 + 68;
   const dimensionsTop = commentTop + commentHeight + 120;
   const footerTop = dimensionsTop + 480;
@@ -37,7 +48,21 @@ export async function createResultImage({h,p,key,language='zh'}) {
   ctx.textBaseline='top';ctx.fillStyle='#65676d';font(30);ctx.fillText(ui.title,margin,58);
   ctx.fillStyle='#e4e4e7';ctx.fillRect(margin,115,contentWidth,1);
   ctx.fillStyle=profile.color;font(72,serif,600);if(ctx.measureText(profile.name).width>contentWidth)font(72*contentWidth/ctx.measureText(profile.name).width,serif,600);ctx.fillText(profile.name,margin,164);
-  ctx.fillStyle='#53555a';font(34);subtitleLines.forEach((line,i)=>ctx.fillText(line,margin,268+i*54));
+  if(honors.length){
+    const scale=1.9,y=256,height=25*scale;
+    ctx.fillStyle='#b2b1b0';font(14*scale);ctx.fillText('+',margin,y+7);
+    let x=margin+36;
+    for(const honor of honors){
+      font(honor.size*scale,honor.family,honor.weight);
+      if('letterSpacing' in ctx)ctx.letterSpacing=`${honor.spacing*scale}px`;
+      const labelWidth=ctx.measureText(honor.text).width+32;
+      ctx.fillStyle=honor.background;ctx.beginPath();ctx.roundRect(x,y,labelWidth,height,6);ctx.fill();
+      ctx.fillStyle=honor.color;ctx.fillText(honor.text,x+16,y+(height-honor.size*scale)/2);
+      x+=labelWidth+16;
+    }
+    if('letterSpacing' in ctx)ctx.letterSpacing='0px';
+  }
+  ctx.fillStyle='#53555a';font(34);subtitleLines.forEach((line,i)=>ctx.fillText(line,margin,268+honorSpace+i*54));
   ctx.fillStyle=profile.wash;ctx.fillRect(margin,commentTop,contentWidth,commentHeight);
   ctx.fillStyle=profile.color;ctx.fillRect(margin,commentTop,3,commentHeight);
   ctx.fillStyle='#202124';font(40,serif);commentLines.forEach((line,i)=>ctx.fillText(line,margin+38,commentTop+34+i*66));
