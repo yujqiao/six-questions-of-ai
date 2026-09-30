@@ -52,7 +52,7 @@ function dimension(title, value, left, right, explanation){
 function coordinatePlane(h, p, key){
   const x = 90 - h / 3 * 80;
   const y = 90 - p / 3 * 80;
-  const hDirection = h >= 2 ? ui.axes[0].right : ui.axes[0].left;
+  const hDirection = h >= 2 ? ui.axes[0].left : ui.axes[0].right;
   const pDirection = p >= 2 ? ui.axes[1].right : ui.axes[1].left;
   const strength = value => value === 0 || value === 3 ? ui.strong : ui.slight;
   const summary = `${strength(h)} · ${hDirection}; ${strength(p)} · ${pDirection}`;
@@ -69,7 +69,7 @@ function renderResult(focus = true){
   document.title=`${profile.name} · ${ui.title}`;
   count.textContent=ui.result;
   footer.textContent=ui.disclaimer;
-  app.innerHTML=`<section aria-labelledby="result-title"><div class="result-heading"><p class="kicker">${ui.kicker}</p><h1 id="result-title" class="result-title" tabindex="-1">${profile.name}</h1><p class="subtitle">${profile.subtitle}</p></div><p class="commentary">${profile.note}</p><section aria-labelledby="dimensions-title"><h2 class="section-title" id="dimensions-title">${ui.dimensions}</h2><div class="result-measures"><div class="dimensions">${ui.axes.map((axis,i)=>dimension(axis.title,i===0?h:p,axis.left,axis.right,axis.description)).join('')}</div>${coordinatePlane(h,p,key)}</div></section><nav class="navigation result-actions" aria-label="${ui.actions}"><button type="button" class="button" id="share-result">${ui.share}</button><button type="button" class="button secondary" id="review">${ui.review}</button><button type="button" class="button secondary" id="restart">${ui.restart}</button></nav></section>`;
+  app.innerHTML=`<section aria-labelledby="result-title"><div class="result-heading"><p class="kicker">${ui.kicker}</p><h1 id="result-title" class="result-title" tabindex="-1">${profile.name}</h1><p class="subtitle">${profile.subtitle}</p></div><p class="commentary">${profile.note}</p><section aria-labelledby="dimensions-title"><h2 class="section-title" id="dimensions-title">${ui.dimensions}</h2><div class="result-measures"><div class="dimensions">${ui.axes.map((axis,i)=>dimension(axis.title,i===0?3-h:p,axis.left,axis.right,axis.description)).join('')}</div>${coordinatePlane(h,p,key)}</div></section><nav class="navigation result-actions" aria-label="${ui.actions}"><button type="button" class="button" id="share-result">${ui.share}</button><button type="button" class="button secondary" id="review">${ui.review}</button><button type="button" class="button secondary" id="restart">${ui.restart}</button></nav></section>`;
   app.querySelector('#share-result').addEventListener('click',async e=>{
     const button=e.currentTarget;button.disabled=true;
     try{const {openResultShare}=await import('./share.js');await openResultShare({h,p,key,language},button);}

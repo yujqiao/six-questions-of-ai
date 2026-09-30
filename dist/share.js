@@ -51,7 +51,7 @@ export async function createResultImage({h,p,key,language='zh'}) {
     ctx.beginPath();ctx.arc(margin+span*value/3,y+103,9,0,2*Math.PI);ctx.fillStyle=profile.color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=3;ctx.stroke();
     ctx.fillStyle='#686a70';font(language==='en'?22:24);lines(left,span*.48).forEach((line,i)=>ctx.fillText(line,margin,y+130+i*27));ctx.textAlign='right';lines(right,span*.48).forEach((line,i)=>ctx.fillText(line,end,y+130+i*27));
   }
-  ui.axes.forEach((axis,i)=>drawDimension(axis.title,i===0?h:p,axis.left,axis.right,dimensionsTop+i*224));
+  ui.axes.forEach((axis,i)=>drawDimension(axis.title,i===0?3-h:p,axis.left,axis.right,dimensionsTop+i*224));
   ctx.fillStyle='#e4e4e7';ctx.fillRect(margin,footerTop-35,contentWidth,1);
   const qrLeft=width-margin-qrSize;
   ctx.fillStyle='#fff';ctx.fillRect(qrLeft,footerTop,qrSize,qrSize);
