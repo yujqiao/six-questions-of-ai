@@ -29,9 +29,7 @@ export async function createResultImage({h,p,key,language='zh'}) {
   const commentTop = 278 + subtitleLines.length * 54;
   const commentHeight = commentLines.length * 66 + 68;
   const dimensionsTop = commentTop + commentHeight + 120;
-  const chartTop = dimensionsTop + 480;
-  const chartSize = 440, chartLeft = (width - chartSize) / 2;
-  const footerTop = chartTop + chartSize + 170;
+  const footerTop = dimensionsTop + 480;
   const qr = qrcode(0,'M'); qr.addData(quizURL); qr.make();
   const modules=qr.getModuleCount(), cell=6, quiet=4, qrSize=(modules+quiet*2)*cell;
   canvas.width=width;canvas.height=footerTop+qrSize+76;
@@ -44,23 +42,6 @@ export async function createResultImage({h,p,key,language='zh'}) {
   ctx.fillStyle=profile.color;ctx.fillRect(margin,commentTop,3,commentHeight);
   ctx.fillStyle='#202124';font(40,serif);commentLines.forEach((line,i)=>ctx.fillText(line,margin+38,commentTop+34+i*66));
   font(30);ctx.fillStyle='#202124';ctx.fillText(ui.dimensions,margin,commentTop+commentHeight+48);
-  ctx.textAlign='center';ctx.fillStyle='#a9abb1';font(22);ctx.fillText(ui.high,chartLeft+chartSize/2,chartTop-54);
-  const quadrantKeys=['technical','autonomous','pure','reform'];
-  quadrantKeys.forEach((k,i)=>{
-    const x=chartLeft+(i%2)*chartSize/2,y=chartTop+Math.floor(i/2)*chartSize/2;
-    if(k===key){ctx.fillStyle=profile.wash;ctx.fillRect(x,y,chartSize/2,chartSize/2);}
-    ctx.fillStyle=k===key?profile.color:'#dfe0e3';font(26,sans,k===key?600:400);
-    const labelLines=lines(profiles[k].name,chartSize/2-24);
-    labelLines.forEach((line,j)=>ctx.fillText(line,x+chartSize/4,y+chartSize/4-labelLines.length*17+j*34));
-  });
-  ctx.strokeStyle='#dedee2';ctx.lineWidth=2;ctx.strokeRect(chartLeft,chartTop,chartSize,chartSize);
-  ctx.beginPath();ctx.moveTo(chartLeft+chartSize/2,chartTop);ctx.lineTo(chartLeft+chartSize/2,chartTop+chartSize);ctx.moveTo(chartLeft,chartTop+chartSize/2);ctx.lineTo(chartLeft+chartSize,chartTop+chartSize/2);ctx.stroke();
-  const dotX=chartLeft+chartSize*(.9-h/3*.8),dotY=chartTop+chartSize*(.9-p/3*.8);
-  ctx.beginPath();ctx.arc(dotX,dotY,18,0,2*Math.PI);ctx.fillStyle='#fff';ctx.fill();ctx.lineWidth=3;ctx.strokeStyle=profile.color;ctx.stroke();
-  ctx.beginPath();ctx.arc(dotX,dotY,11,0,2*Math.PI);ctx.fillStyle=profile.color;ctx.fill();
-  ctx.fillStyle='#a9abb1';font(22);ctx.textAlign='left';ctx.fillText('Hands-on',chartLeft,chartTop+chartSize+24);
-  ctx.textAlign='right';ctx.fillText('Hands-off',chartLeft+chartSize,chartTop+chartSize+24);
-  ctx.textAlign='center';ctx.fillText(ui.low,chartLeft+chartSize/2,chartTop+chartSize+80);
   function drawDimension(title,value,left,right,y){
     const end=width-margin,span=end-margin;
     ctx.textAlign='left';ctx.fillStyle='#202124';font(language==='en'?26:29,sans,500);ctx.fillText(title,margin,y);
